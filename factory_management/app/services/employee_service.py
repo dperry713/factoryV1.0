@@ -1,6 +1,21 @@
 from app.models import Employee
 from app.extensions import db
 
+def analyze_employee_performance():
+    query = """
+    SELECT 
+        e.name AS employee_name,
+        SUM(p.quantity) AS total_quantity_produced
+    FROM 
+        Production p
+    JOIN 
+        Employee e ON p.employee_id = e.id
+    GROUP BY 
+        e.name;
+    """
+    result = db.session.execute(query).fetchall()
+    return [{"employee_name": row["employee_name"], "total_quantity_produced": row["total_quantity_produced"]} for row in result]
+
 def get_all_employees():
     employees = Employee.query.all()
     return [{"id": e.id, "name": e.name, "position": e.position} for e in employees]

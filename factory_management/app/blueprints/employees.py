@@ -6,8 +6,15 @@ from app.services.employee_service import (
     update_employee,
     delete_employee,
 )
+import analyze_employee_performance
+
 
 employees_bp = Blueprint('employees', __name__)
+
+@employees_bp.route('/performance', methods=['GET'])
+def employee_performance():
+    performance_data = analyze_employee_performance()
+    return jsonify(performance_data), 200
 
 @employees_bp.route('/', methods=['GET'])
 def list_employees():

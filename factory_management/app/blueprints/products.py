@@ -7,8 +7,14 @@ from app.services.product_service import (
     delete_product,
 )
 import get_paginated_products
+import identify_top_selling_products
 
 products_bp = Blueprint('products', __name__)
+
+@products_bp.route('/top-selling', methods=['GET'])
+def top_selling_products():
+    top_products = identify_top_selling_products()
+    return jsonify(top_products), 200
 
 @products_bp.route('/', methods=['GET'])
 def list_products():

@@ -1,6 +1,24 @@
 from app.models import Production
 from app.extensions import db
 
+def evaluate_production_efficiency(production_date):
+    query = """
+    SELECT 
+        prod.name AS product_name,
+        SUM(p.quantity) AS total_quantity_produced
+    FROM 
+        Production p
+    JOIN 
+        Product prod ON p.product_id = prod.id
+    WHERE 
+        p.date = :production_date
+    GROUP BY 
+        prod.name;
+    """
+    result = db.session.execute(query, {"production_date": production_date}).fetchall()
+    return [{"product_name": row["product_name"], "total_quantity_produced": row["total_quantity_produced"]} for row in result]
+
+
 def get_all_production_records():
     records = Production.query.all()
     return [{"id": r.id, "product_id": r.product_id, "date": r.date} for r in records]

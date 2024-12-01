@@ -6,8 +6,17 @@ from app.services.production_service import (
     update_production_record,
     delete_production_record,
 )
+import evaluate_production_efficiency
 
 production_bp = Blueprint('production', __name__)
+
+@production_bp.route('/efficiency', methods=['GET'])
+def production_efficiency():
+    production_date = request.args.get('date')
+    if not production_date:
+        return jsonify({"error": "Date parameter is required"}), 400
+    efficiency_data = evaluate_production_efficiency(production_date)
+    return jsonify(efficiency_data), 200
 
 @production_bp.route('/', methods=['GET'])
 def list_production_records():

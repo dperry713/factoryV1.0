@@ -6,8 +6,15 @@ from app.services.customer_service import (
     update_customer,
     delete_customer,
 )
+import calculate_customer_lifetime_value
 
 customers_bp = Blueprint('customers', __name__)
+
+@customers_bp.route('/lifetime-value', methods=['GET'])
+def customer_lifetime_value():
+    threshold = request.args.get('threshold', 1000, type=float)
+    customer_values = calculate_customer_lifetime_value(threshold=threshold)
+    return jsonify(customer_values), 200
 
 @customers_bp.route('/', methods=['GET'])
 def list_customers():

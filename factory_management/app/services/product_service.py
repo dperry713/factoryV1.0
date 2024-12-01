@@ -15,6 +15,24 @@ def get_paginated_products(page, per_page):
         "per_page": paginated_result.per_page
     }
 
+def identify_top_selling_products():
+    query = """
+    SELECT 
+        prod.name AS product_name,
+        SUM(o.quantity) AS total_quantity_sold
+    FROM 
+        `Order` o
+    JOIN 
+        Product prod ON o.product_id = prod.id
+    GROUP BY 
+        prod.name
+    ORDER BY 
+        total_quantity_sold DESC;
+    """
+    result = db.session.execute(query).fetchall()
+    return [{"product_name": row["product_name"], "total_quantity_sold": row["total_quantity_sold"]} for row in result]
+
+
 def get_all_products():
     products = Product.query.all()
     return [{"id": p.id, "name": p.name, "price": p.price} for p in products]

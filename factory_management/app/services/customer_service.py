@@ -1,6 +1,26 @@
 from app.models import Customer
 from app.extensions import db
 
+def calculate_customer_lifetime_value(threshold=1000):
+    query = """
+    SELECT 
+        c.name AS customer_name,
+        SUM(o.quantity * prod.price) AS total_order_value
+    FROM 
+        `Order` o
+    JOIN 
+        Customer c ON o.customer_id = c.id
+    JOIN 
+        Product prod ON o.product_id = prod.id
+    GROUP BY 
+        c.name
+    HAVING 
+        SUM(o.quantity * prod.price) >= :threshold;
+    """
+    result = db.session.execute(query, {"threshold": threshold}).fetchall()
+    return [{"customer_name": row["customer_name"], "total_order_value": row["total_order_value"]} for row in result]
+
+
 def get_all_customers():
     customers = Customer.query.all()
     return [{"id": c.id, "name": c.name} for c in customers]
